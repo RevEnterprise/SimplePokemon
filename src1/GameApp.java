@@ -8,7 +8,6 @@ public class GameApp extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
-        // Ukuran Layar
         int widthScreen = 800;
         int heightScreen = 600;
         

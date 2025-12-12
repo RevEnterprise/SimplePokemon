@@ -1,6 +1,6 @@
 public class Move {
     private final String name;
-    private final int damage; // positive integer, e.g. 4
+    private final int damage;
     private final ElementType type;
 
     public Move(String name, int damage, ElementType type) {

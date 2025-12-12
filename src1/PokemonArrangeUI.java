@@ -4,14 +4,12 @@ import java.util.ArrayList;
 
 public class PokemonArrangeUI extends JDialog {
 
-    // Helper method to format the display string
     private String getPokemonDisplayString(Pokemon p) {
         return String.format("%s (HP: %d/%d)", p.getName(), p.getCurrentHp(), p.getMaxHp());
     }
 
     public PokemonArrangeUI(JFrame parent, Trainer trainer) {
-        super(parent, "Rearrange Pokemon", true);
-        // Removed comments as per your request.
+        super(parent, "Rearrange Pokémon", true);
         setSize(350, 400);
         setLocationRelativeTo(parent);
 
@@ -19,7 +17,7 @@ public class PokemonArrangeUI extends JDialog {
 
         DefaultListModel<String> model = new DefaultListModel<>();
         for (Pokemon p : trainer.getPokemon())
-            model.addElement(getPokemonDisplayString(p)); // Use the new helper method here
+            model.addElement(getPokemonDisplayString(p));
 
         JList<String> list = new JList<>(model);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -57,6 +55,6 @@ public class PokemonArrangeUI extends JDialog {
     private void refresh(DefaultListModel<String> model, ArrayList<Pokemon> arr) {
         model.clear();
         for (Pokemon p : arr)
-            model.addElement(getPokemonDisplayString(p)); // Use the new helper method here
+            model.addElement(getPokemonDisplayString(p));
     }
 }

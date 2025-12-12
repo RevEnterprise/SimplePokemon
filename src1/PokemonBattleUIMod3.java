@@ -8,10 +8,9 @@ import java.util.Random;
 
 public class PokemonBattleUIMod3 extends JFrame {
 
-    private Pokemon playerPokemon; // Pokemon yang sedang aktif bertarung
+    private Pokemon playerPokemon;
     private Pokemon enemyPokemon;
 
-    // UI components (needed across methods)
     private JLabel battleMessage;
     private JLabel enemyImageLabel;
     private JLabel playerImageLabel;
@@ -30,8 +29,7 @@ public class PokemonBattleUIMod3 extends JFrame {
     private JLayeredPane layered;
     private final Random rand = new Random();
 
-    // timing
-    private final int enemyDelayMs = 2000; // 2 seconds delay as requested
+    private final int enemyDelayMs = 2000;
 
     private Runnable onBattleEnd;
 
@@ -43,7 +41,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         soundManager = new SoundManager();
         soundManager.playMusic("../POKEMON/music/battle_theme.wav");
 
-        // ==== UI 50% layar ====
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int widthScreen = screenSize.width / 2;
         int heightScreen = screenSize.height / 2;
@@ -62,19 +59,14 @@ public class PokemonBattleUIMod3 extends JFrame {
 
         layered = getLayeredPane();
 
-        // ==== BG ====
         ImageIcon bgIcon = new ImageIcon("../POKEMON/BattleBackground.png");
         Image bgScaled = bgIcon.getImage().getScaledInstance(widthScreen, heightScreen, Image.SCALE_SMOOTH);
         JLabel bgLabel = new JLabel(new ImageIcon(bgScaled));
         bgLabel.setBounds(0, 0, widthScreen, heightScreen);
         layered.add(bgLabel, Integer.valueOf(0));
 
-        // create Pokemon models (player roster + enemy)
         createPokemons();
 
-        // =====================================================
-        //  ENEMY (Squirtle) info & HP bar
-        // =====================================================
         JLabel enemyLabel = new JLabel(enemyPokemon.getName().toUpperCase());
         enemyLabel.setFont(infoFont);
         enemyLabel.setBounds(20, 20, infoWidth, infoHeight);
@@ -90,7 +82,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         enemyHPBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         layered.add(enemyHPBar, Integer.valueOf(1));
 
-        // enemy sprite
         ImageIcon enemySpriteIcon = new ImageIcon(enemyPokemon.getSpritePathEnemy());
         int sqTargetHeight = 150;
         int sqTargetWidth = Math.max(1, enemySpriteIcon.getIconWidth() * sqTargetHeight / Math.max(1, enemySpriteIcon.getIconHeight()));
@@ -99,7 +90,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         enemyImageLabel.setBounds(widthScreen - sqTargetWidth - 70, 40, sqTargetWidth, sqTargetHeight);
         layered.add(enemyImageLabel, Integer.valueOf(1));
 
-        // MESSAGE BOX (battle dialog)
         battleMessage = new JLabel("What will " + playerPokemon.getName() + " do?");
         battleMessage.setFont(new Font("Arial", Font.BOLD, 18));
         battleMessage.setOpaque(true);
@@ -108,9 +98,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         battleMessage.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         layered.add(battleMessage, Integer.valueOf(2));
 
-        // =====================================================
-        //  PLAYER info & HP bar
-        // =====================================================
         JLabel playerLabel = new JLabel(playerPokemon.getName().toUpperCase() + " : L5");
         playerLabel.setFont(infoFont);
         playerLabel.setBounds(widthScreen - infoWidth - 20, heightScreen - (int) (heightScreen * 0.50),
@@ -134,7 +121,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         playerHPBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         layered.add(playerHPBar, Integer.valueOf(1));
 
-        // player sprite
         ImageIcon playerSpriteIcon = new ImageIcon(playerPokemon.getSpritePath());
         int chTargetHeight = 200;
         int chTargetWidth = Math.max(1, playerSpriteIcon.getIconWidth() * chTargetHeight / Math.max(1, playerSpriteIcon.getIconHeight()));
@@ -143,11 +129,10 @@ public class PokemonBattleUIMod3 extends JFrame {
         playerImageLabel.setBounds(50, heightScreen - chTargetHeight - 120, chTargetWidth, chTargetHeight);
         layered.add(playerImageLabel, Integer.valueOf(1));
 
-        // PANEL BUTTON
         commandPanel = new JPanel();
         commandPanel.setLayout(null);
         commandPanel.setOpaque(false);
-        int panelHeight = 120; // make a bit taller to fit buttons better
+        int panelHeight = 120;
         commandPanel.setBounds(0, heightScreen - panelHeight, widthScreen, panelHeight);
         layered.add(commandPanel, Integer.valueOf(5));
 
@@ -175,12 +160,10 @@ public class PokemonBattleUIMod3 extends JFrame {
         backBtn = new JButton("BACK");
         backBtn.setBounds(60 + btnWidth * 2, 20, btnWidth, btnHeight);
 
-        // action: open fight menu
         fightBtn.addActionListener(e -> swapToMoves());
 
         backBtn.addActionListener(e -> swapToMain());
 
-        // PKMN button -> switch between Charmander and Pikachu (simple chooser)
         pkmnBtn.addActionListener(e -> openSwitchMenu(true));
 
         runBtn.addActionListener(e -> finishBattle());
@@ -188,7 +171,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         move1Btn.addActionListener(e -> playerUseMove(playerPokemon.getMove1()));
         move2Btn.addActionListener(e -> playerUseMove(playerPokemon.getMove2()));
 
-        // initial state: main menu
         swapToMain();
     }
 
@@ -197,35 +179,28 @@ public class PokemonBattleUIMod3 extends JFrame {
             soundManager.stopMusic();
         }
 
-        // Panggil callback untuk kembali ke Overworld
         if (onBattleEnd != null) {
             onBattleEnd.run();
         }
         
-        // Tutup jendela battle
         dispose();
     }
 
-    // Method untuk menampilkan dialog ganti pokemon
     private void openSwitchMenu(boolean allowCancel) {
         List<String> optionsLabels = new ArrayList<>();
         List<Pokemon> availablePoke = new ArrayList<>();
 
-        // Cek setiap pokemon di party
         for (Pokemon p : playerParty) {
-            // Hanya tampilkan pokemon yang HIDUP (hp > 0)
             if (!p.isFainted()) {
                 optionsLabels.add(p.getName() + " (HP: " + p.getCurrentHp() + ")");
                 availablePoke.add(p);
             }
         }
 
-        // Tambah opsi Cancel jika boleh
         if (allowCancel) {
             optionsLabels.add("Cancel");
         }
 
-        // Konversi ke Array untuk JOptionPane
         Object[] options = optionsLabels.toArray();
 
         int chosenIndex = JOptionPane.showOptionDialog(this,
@@ -237,38 +212,32 @@ public class PokemonBattleUIMod3 extends JFrame {
                 options,
                 options[0]);
 
-        // Logika handling pilihan user
         if (chosenIndex >= 0 && chosenIndex < availablePoke.size()) {
             Pokemon selected = availablePoke.get(chosenIndex);
 
-            // Cek apakah memilih diri sendiri
             if (selected == playerPokemon) {
                 battleMessage.setText(selected.getName() + " is already out!");
-                if (!allowCancel) openSwitchMenu(false); // Ulangi jika forced switch
+                if (!allowCancel) openSwitchMenu(false);
             } else {
                 switchPlayerTo(selected);
                 if (!allowCancel) enableCommandPanel();
             }
         } else {
-            // Jika user klik tombol X atau Cancel
-            if (!allowCancel) openSwitchMenu(false); // Paksa buka lagi kalau forced
+            if (!allowCancel) openSwitchMenu(false);
         }
     }
 
     private void showWhitedOutScreen() {
-        // Buat Panel Hitam
         JPanel blackPanel = new JPanel();
         blackPanel.setBackground(Color.BLACK);
         blackPanel.setBounds(0, 0, getWidth(), getHeight());
-        blackPanel.setLayout(new GridBagLayout()); // Agar teks di tengah
+        blackPanel.setLayout(new GridBagLayout());
 
-        // Teks "You Whited Out!"
         JLabel text = new JLabel("You have no more Pokémon... Whited Out!");
         text.setFont(new Font("Arial", Font.BOLD, 24));
         text.setForeground(Color.WHITE);
         blackPanel.add(text);
 
-        // Tambahkan ke layer paling atas (Dragons layer / angka tinggi)
         layered.add(blackPanel, Integer.valueOf(100));
         layered.repaint();
     }
@@ -280,12 +249,8 @@ public class PokemonBattleUIMod3 extends JFrame {
         playerPokemon = player.getFirstPokemon();
 
         if (enemyTrainerData != null) {
-            // === SKENARIO TRAINER BATTLE ===
-            // Ambil pokemon milik NPC yang ditabrak
-            // Asumsi class Trainer punya method getPokemon() yang return List<Pokemon>
             enemyParty1.addAll(enemyTrainerData.getPokemon());
             
-            // Validasi jika NPC lupa dikasih pokemon, kasih 1 random biar gak crash
             if (enemyParty1.isEmpty()) {
                 enemyParty1.add(MonsterFactory.createRandomWild());
             }
@@ -298,10 +263,8 @@ public class PokemonBattleUIMod3 extends JFrame {
 
     }
 
-    // swap UI to move options
     private void swapToMoves() {
         commandPanel.removeAll();
-        // update texts to reflect current player's moves
         move1Btn.setText(playerPokemon.getMove1().getName());
         move2Btn.setText(playerPokemon.getMove2().getName());
         commandPanel.add(move1Btn);
@@ -311,7 +274,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         commandPanel.repaint();
     }
 
-    // swap UI to main command menu
     private void swapToMain() {
         commandPanel.removeAll();
         commandPanel.add(fightBtn);
@@ -326,8 +288,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         if (newPlayer == playerPokemon) return;
         playerPokemon = newPlayer;
 
-        // update sprite, HP bar, HP text, move buttons
-        // update player sprite image
         ImageIcon playerSpriteIcon = new ImageIcon(playerPokemon.getSpritePath());
         int chTargetHeight = 200;
         int chTargetWidth = Math.max(1, playerSpriteIcon.getIconWidth() * chTargetHeight / Math.max(1, playerSpriteIcon.getIconHeight()));
@@ -343,7 +303,6 @@ public class PokemonBattleUIMod3 extends JFrame {
         move2Btn.setText(playerPokemon.getMove2().getName());
 
         battleMessage.setText("Switched to " + playerPokemon.getName() + "!");
-        // return to main menu after short delay
         new Timer(800, (ActionEvent e) -> {
             ((Timer) e.getSource()).stop();
             swapToMain();
@@ -351,34 +310,23 @@ public class PokemonBattleUIMod3 extends JFrame {
     }
 
     private void switchToNextEnemy() {
-        // Cari musuh berikutnya yang masih hidup di list
         for (Pokemon p : enemyParty1) {
             if (!p.isFainted()) {
-                enemyPokemon = p; // Ganti pointer aktif
+                enemyPokemon = p;
                 break;
             }
         }
 
-        // === UPDATE UI MUSUH (PENTING) ===
-        
-        // 1. Update Nama
-        // (Asumsi variable label musuh kamu namanya 'enemyLabel')
-        // Kita harus cari komponen JLabel enemyLabel dulu atau jadikan global variable.
-        // Tapi untuk HP Bar dan Gambar kita sudah punya global variablenya.
-
-        // 2. Update HP Bar
         enemyHPBar.setMaximum(enemyPokemon.getMaxHp());
         enemyHPBar.setValue(enemyPokemon.getCurrentHp());
         updateHPBarColor(enemyHPBar, enemyPokemon.getCurrentHp(), enemyPokemon.getMaxHp());
 
-        // 3. Update Gambar (Sprite Depan)
         ImageIcon enemySpriteIcon = new ImageIcon(enemyPokemon.getSpritePathEnemy());
         int sqTargetHeight = 150;
         int sqTargetWidth = Math.max(1, enemySpriteIcon.getIconWidth() * sqTargetHeight / Math.max(1, enemySpriteIcon.getIconHeight()));
         Image scaledEnemy = enemySpriteIcon.getImage().getScaledInstance(sqTargetWidth, sqTargetHeight, Image.SCALE_DEFAULT);
         enemyImageLabel.setIcon(new ImageIcon(scaledEnemy));
         enemyImageLabel.setSize(sqTargetWidth, sqTargetHeight);
-        // Perbaiki posisi X agar tetap rapi di kanan
         int widthScreen = getWidth();
         enemyImageLabel.setLocation(widthScreen - sqTargetWidth - 70, 40);
 
@@ -391,21 +339,14 @@ public class PokemonBattleUIMod3 extends JFrame {
         boolean playerGoesFirst = decideFirst(playerPokemon.getSpeed(), enemyPokemon.getSpeed());
 
         if (playerGoesFirst) {
-            // === SKENARIO 1: PLAYER JALAN DULUAN ===
-            
-            // 1. Tampilkan dulu: "Charmander used Ember!"
             battleMessage.setText(playerPokemon.getName() + " used " + move.getName() + "!");
 
-            // 2. Tunggu 1 detik agar user sempat baca
             new javax.swing.Timer(1000, e -> {
                 ((javax.swing.Timer)e.getSource()).stop();
 
-                // 3. BARU Hitung Damage (Di sini teks akan berubah jadi "Super Effective")
                 int damage = calculateDamage(move, playerPokemon, enemyPokemon);
 
-                // 4. Lakukan Serangan
                 performAttack(true, damage, () -> {
-                    // Setelah player selesai, giliran musuh (jika masih hidup)
                     if (enemyPokemon.getCurrentHp() > 0) {
                          new javax.swing.Timer(enemyDelayMs, ev -> {
                              ((javax.swing.Timer)ev.getSource()).stop();
@@ -418,23 +359,16 @@ public class PokemonBattleUIMod3 extends JFrame {
             }).start();
 
         } else {
-             // === SKENARIO 2: MUSUH JALAN DULUAN ===
-             // Langsung lempar ke enemyTurn, nanti player nyerang di dalam callback (afterEnemyFinish)
              enemyTurn(() -> {
                  if (!playerPokemon.isFainted()) {
-                     // GILIRAN PLAYER MEMBALAS
                      
-                     // 1. Tampilkan teks dulu
                      battleMessage.setText(playerPokemon.getName() + " used " + move.getName() + "!");
                      
-                     // 2. Tunggu 1 detik
                      new javax.swing.Timer(1000, e -> {
                          ((javax.swing.Timer)e.getSource()).stop();
                          
-                         // 3. Hitung & Update Teks Super Effective
                          int damage = calculateDamage(move, playerPokemon, enemyPokemon);
                          
-                         // 4. Serang
                          performAttack(true, damage, () -> {
                              if (enemyPokemon.getCurrentHp() <= 0) onFaint(true);
                              else enableCommandPanel();
@@ -453,27 +387,21 @@ public class PokemonBattleUIMod3 extends JFrame {
         return rand.nextBoolean();
     }
 
-    // enemy turn with default behavior (random moves 70:30)
 private void enemyTurn() {
         enemyTurn(null);
     }
 
     private void enemyTurn(Runnable afterEnemyFinish) {
-        // AI Logic
         int roll = rand.nextInt(100);
         Move enemyMove = (roll < 70) ? enemyPokemon.getMove1() : enemyPokemon.getMove2();
 
-        // 1. Tampilkan teks serangan musuh dulu
         battleMessage.setText(enemyPokemon.getName() + " used " + enemyMove.getName() + "!");
 
-        // 2. Tunggu 1 detik
         new javax.swing.Timer(1000, e -> {
             ((javax.swing.Timer)e.getSource()).stop();
 
-            // 3. Hitung damage ke Player (Teks berubah jadi "It's Super Effective" di sini)
             int damageToPlayer = calculateDamage(enemyMove, enemyPokemon, playerPokemon);
 
-            // 4. Lakukan animasi serangan
             performAttack(false, damageToPlayer, () -> {
                 if (playerPokemon.isFainted()) {
                     onFaint(false);
@@ -488,21 +416,14 @@ private void enemyTurn() {
         }).start();
     }
 
-    // Method ini sekarang butuh 3 parameter: Jurus, Penyerang, Bertahan
     private int calculateDamage(Move move, Pokemon attacker, Pokemon defender) {
         
-        // 1. Ambil Efektivitas (Super Effective / Not Very Effective)
         double multiplier = ElementType.getEffectiveness(move.getType(), defender.getType());
         
-        // 2. RUMUS DAMAGE BARU
-        // Rumus: Base Damage Move + (Attack Penyerang / 2)
-        // Contoh: Ember (40) + Charmander Attack (52 / 2 = 26) = 66 Damage Dasar
         int baseDamage = move.getDamage() + (attacker.getAttack() / 2);
         
-        // 3. Kalikan dengan Multiplier Element
         int finalDamage = (int) (baseDamage * multiplier);
         
-        // 4. Update Teks Battle
         if (multiplier > 1.0) {
             battleMessage.setText("It's Super Effective!");
         } else if (multiplier < 1.0 && multiplier > 0) {
@@ -514,18 +435,12 @@ private void enemyTurn() {
         return Math.max(1, finalDamage);
     }
 
-    // performAttack: handles damage popup, shake, HP smooth decrement for target
-    // attackerIsPlayer: true means player attacked enemy; false means enemy attacked player.
-    // damage: positive integer amount
     private void performAttack(boolean attackerIsPlayer, int damage, Runnable onComplete) {
-        // disable user input during attack
         disableCommandPanel();
 
-        // target components depend on attacker
         JLabel targetImage = attackerIsPlayer ? enemyImageLabel : playerImageLabel;
         JProgressBar targetHPBar = attackerIsPlayer ? enemyHPBar : playerHPBar;
 
-        // find target model & starting HP
         final int startHp;
         final int targetMax;
         if (attackerIsPlayer) {
@@ -536,7 +451,6 @@ private void enemyTurn() {
             targetMax = playerPokemon.getMaxHp();
         }
 
-        // Create ephemeral damage popup
         String dmgText = "-" + damage;
         JLabel popup = new JLabel(dmgText);
         popup.setFont(new Font("Arial", Font.BOLD, 26));
@@ -547,7 +461,6 @@ private void enemyTurn() {
         layered.add(popup, Integer.valueOf(50));
         layered.repaint();
 
-        // popup rise + fade using Timer
         final int[] alpha = {255};
         final int[] rise = {0};
         Timer popupTimer = new Timer(30, null);
@@ -565,7 +478,6 @@ private void enemyTurn() {
         });
         popupTimer.start();
 
-        // Shake effect
         final int baseX = targetImage.getX();
         final int baseY = targetImage.getY();
         Timer shakeTimer = new Timer(40, null);
@@ -581,7 +493,6 @@ private void enemyTurn() {
         });
         shakeTimer.start();
 
-        // Smooth HP reduction timer: update target HP one by one
         Timer hpTimer = new Timer(10, null);
         hpTimer.addActionListener((ActionEvent e) -> {
             if (attackerIsPlayer) {
@@ -595,7 +506,6 @@ private void enemyTurn() {
                 updateHPBarColor(playerHPBar, playerPokemon.getCurrentHp(), playerPokemon.getMaxHp());
             }
 
-            // stop when we've applied 'damage' total
             if (attackerIsPlayer) {
                 if (enemyPokemon.getCurrentHp() <= Math.max(0, startHp - damage)) {
                     hpTimer.stop();
@@ -615,12 +525,8 @@ private void enemyTurn() {
             }
         });
 
-        // Start HP timer after tiny delay so popup & shake visible
         new Timer(120, (ActionEvent e) -> {
             ((Timer) e.getSource()).stop();
-            // apply full damage total via repeated ticks
-            // to make sure we decrease exactly 'damage' points in total,
-            // we start hpTimer and it decrements 1 per tick until target reached
             hpTimer.start();
         }).start();
     }
@@ -641,29 +547,23 @@ private void enemyTurn() {
     }
 
     private boolean checkAnyPokemonAlive() {
-        // Loop semua pokemon di dalam party
         for (Pokemon p : playerParty) {
-            // Jika ketemu SATU saja yang belum pingsan, return true (masih ada harapan)
             if (!p.isFainted()) {
                 return true;
             }
         }
-        // Jika loop selesai dan tidak ada yang hidup
         return false;
     }
 
-    // onFaint: true means enemy fainted, false means player fainted
     private void onFaint(boolean enemyFainted) {
-        disableCommandPanel(); // Matikan tombol dulu
+        disableCommandPanel();
 
         if (enemyFainted) {
-        // === MUSUH PINGSAN ===
         battleMessage.setText("Enemy " + enemyPokemon.getName() + " fainted!");
 
         new javax.swing.Timer(1500, e -> {
             ((javax.swing.Timer)e.getSource()).stop();
             
-            // CEK APAKAH MASIH ADA MUSUH LAIN?
             boolean anyEnemyAlive = false;
             for (Pokemon p : enemyParty1) {
                 if (!p.isFainted()) {
@@ -673,20 +573,16 @@ private void enemyTurn() {
             }
 
             if (anyEnemyAlive) {
-                // MASIH ADA -> Ganti ke musuh selanjutnya
                 switchToNextEnemy();
                 
-                // Kembalikan giliran ke player (aktifkan tombol)
                 enableCommandPanel();
                 
-                // Opsional: Timer sebentar biar teks "Sent out..." terbaca
                 new javax.swing.Timer(1000, ev -> {
                      ((javax.swing.Timer)ev.getSource()).stop();
                      battleMessage.setText("What will " + playerPokemon.getName() + " do?");
                 }).start();
 
             } else {
-                // SUDAH HABIS -> BARU MENANG
                 battleMessage.setText("You defeated the Trainer!");
                 JOptionPane.showMessageDialog(this, "Victory! You gained a valuable life experience that will lead you to become a pokemon master.");
                 finishBattle();
@@ -694,33 +590,19 @@ private void enemyTurn() {
         }).start();
 
     } else {
-            // === PLAYER KALAH (LOSE / SWITCH) ===
             battleMessage.setText(playerPokemon.getName() + " fainted!");
 
             new javax.swing.Timer(1500, e -> {
                 ((javax.swing.Timer)e.getSource()).stop();
 
                 if (checkAnyPokemonAlive()) {
-                    // KASUS A: Masih punya Pokemon lain -> Paksa Ganti
                     battleMessage.setText("Choose your next Pokémon!");
-                    openSwitchMenu(false); // false = Gak boleh cancel
+                    openSwitchMenu(false);
                 } else {
-                    // KASUS B: Semua Pokemon pingsan -> Game Over
                     showWhitedOutScreen();
                     finishBattle();
                 }
             }).start();
         }
     }
-
-    /*public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            PokemonBattleUIMod3 ui = new PokemonBattleUIMod3(
-                () -> System.exit(0), 
-                player
-            );
-            ui.setVisible(true);
-        });
-    }*/
-
 }

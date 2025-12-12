@@ -26,7 +26,6 @@ public class PlayerTrainer extends Trainer {
         this.spritePathMoveWest1 = spritePathMoveWest1;
         this.spritePathMoveWest2 = spritePathMoveWest2;
 
-        // Add starting Pokémon
         addPokemon(MonsterFactory.createCharmander());
         addPokemon(MonsterFactory.createPikachu());
         addPokemon(MonsterFactory.createLatias());

@@ -7,8 +7,8 @@ public class MonsterFactory {
     public static Pokemon createCharmander() {
         return new Pokemon(
             "Charmander",
-            139, // MaxHP
-            65,  // Speed
+            139,
+            65, 
             52,
             createMove("Ember", 40, ElementType.FIRE),
             createMove("Scratch", 40, ElementType.NORMAL),
@@ -46,7 +46,6 @@ public class MonsterFactory {
         );
     }
 
-    // Johto Starter
     public static Pokemon createCyndaquil() {
         return new Pokemon(
             "Cyndaquil",
@@ -89,7 +88,6 @@ public class MonsterFactory {
         );
     }
 
-    // Special 
     public static Pokemon createPikachu() {
         return new Pokemon(
             "Pikachu",
@@ -118,7 +116,6 @@ public class MonsterFactory {
         );
     }
     
-    // Fire
     public static Pokemon createCamerupt() {
         return new Pokemon(
             "Camerupt",
@@ -159,7 +156,6 @@ public class MonsterFactory {
         );
     }
 
-    // Grass
     public static Pokemon createSwadloon() {
         return new Pokemon(
             "Swadloon",
@@ -187,7 +183,6 @@ public class MonsterFactory {
         );
     }    
 
-    // Water
     public static Pokemon createMagikarp() {
         return new Pokemon(
             "Magikarp",
@@ -229,7 +224,6 @@ public class MonsterFactory {
     }
 
 
-    // Other
     public static Pokemon createChansey() {
         return new Pokemon(
             "Chansey",
@@ -299,7 +293,6 @@ public class MonsterFactory {
     }
 
 
-    // FUN!
     public static Pokemon createRegice() {
         return new Pokemon(
             "Regice",
@@ -328,7 +321,6 @@ public class MonsterFactory {
         );
     }
 
-    // Generator Random Wild Pokemon
     public static Pokemon createRandomWild() {
         class PokemonWeight {
             Pokemon pokemon;
@@ -337,7 +329,6 @@ public class MonsterFactory {
         }
 
         PokemonWeight[] wildPokemons = {
-            // Starter (jarang)
             new PokemonWeight(createCharmander(), 0.02),
             new PokemonWeight(createSquirtle(), 0.02),
             new PokemonWeight(createBulbasaur(), 0.02),
@@ -345,32 +336,26 @@ public class MonsterFactory {
             new PokemonWeight(createTotodile(), 0.02),
             new PokemonWeight(createChikorita(), 0.02),
 
-            // Special
             new PokemonWeight(createPikachu(), 0.05),
             new PokemonWeight(createEevee(), 0.05),
 
-            // Fire
             new PokemonWeight(createCamerupt(), 0.07),
             new PokemonWeight(createVulpix(), 0.07),
             new PokemonWeight(createSlugma(), 0.06),
 
-            // Grass
             new PokemonWeight(createSwadloon(), 0.08),
             new PokemonWeight(createTropius(), 0.07),
 
-            // Water
             new PokemonWeight(createMagikarp(), 0.08),
             new PokemonWeight(createMantine(), 0.07),
             new PokemonWeight(createMarill(), 0.07),
 
-            // Other
             new PokemonWeight(createChansey(), 0.05),
             new PokemonWeight(createPidgey(), 0.05),
             new PokemonWeight(createNatu(), 0.05),
             new PokemonWeight(createDratini(), 0.05),
             new PokemonWeight(createZangoose(), 0.05),
 
-            // FUN / Boss
             new PokemonWeight(createRegice(), 0.005),
             new PokemonWeight(createLatias(), 0.005)
         };
@@ -383,6 +368,6 @@ public class MonsterFactory {
             r -= pw.weight;
             if (r <= 0) return pw.pokemon;
         }
-        return wildPokemons[wildPokemons.length-1].pokemon; // fallback
+        return wildPokemons[wildPokemons.length-1].pokemon;
     }
 }

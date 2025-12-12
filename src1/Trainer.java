@@ -6,7 +6,7 @@ public class Trainer {
     private int col;
     private int row;
 
-    private int facingDirection = 1; // 0=N,1=S,2=E,3=W
+    private int facingDirection = 1;
 
     private final String spritePathStandingNorth;
 
@@ -44,7 +44,6 @@ public class Trainer {
         return pokemon.size() < MAX_POKEMON;
     }
 
-    /** Add one Pokémon to trainer's roster */
     public void addPokemon(Pokemon p) {
         if (p != null) pokemon.add(p);
     }
