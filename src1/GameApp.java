@@ -4,7 +4,7 @@ import java.awt.*;
 public class GameApp extends JFrame {
 
     public GameApp() {
-        setTitle("Trainer Exploration Game");
+        setTitle("PokemonLite");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
